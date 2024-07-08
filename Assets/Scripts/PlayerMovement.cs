@@ -14,6 +14,7 @@ public class PlayerMovement : MonoBehaviour
 
     public float sideSpeed;
     public float jumpForce;
+    public float slidingForce;
 
     bool isGameStarted = false;
     
@@ -23,7 +24,6 @@ public class PlayerMovement : MonoBehaviour
         isGameStarted = false;
         currentPos = 0;
     }
-
   
     void Update()
     {
@@ -34,6 +34,7 @@ public class PlayerMovement : MonoBehaviour
                 Debug.Log("Game is started");
                 isGameStarted = true;
                 playerAnimator.SetInteger("isRunning", 1);
+                playerAnimator.speed = 1.2f;
             }
         }
         
@@ -95,9 +96,31 @@ public class PlayerMovement : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                //rb.AddForce(Vector3.up * jumpForce);
+                playerAnimator.SetInteger("isJump", 1);
                 rb.velocity = Vector3.up * jumpForce;
+                StartCoroutine(Jump());
+            }
+
+            if (Input.GetKeyDown(KeyCode.S))
+            {
+                playerAnimator.SetInteger("isSliding", 1);
+                rb.MovePosition(rb.position + new Vector3(0,0,2.2f) * playerAnimator.deltaPosition.magnitude * slidingForce);             
+                StartCoroutine(Slide());
             }
         }
+    }
+
+    IEnumerator Jump()
+    {
+        playerAnimator.SetInteger("isJump", 1);
+        yield return new WaitForSeconds(0.1f);
+        playerAnimator.SetInteger("isJump", 0);
+    }
+
+    IEnumerator Slide()
+    {
+        playerAnimator.SetInteger("isSliding", 1);
+        yield return new WaitForSeconds(0.1f);
+        playerAnimator.SetInteger("isSliding", 0);
     }
 }
